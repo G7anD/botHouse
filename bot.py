@@ -29,19 +29,19 @@ def image(pil):
     from io import BytesIO
     location = BytesIO()
     location.name = 'image.jpg'
-    pil.save(location, 'JPG')
+    pil.save(location, 'JPEG')
     location.seek(0)
     return location
 
 @dp.message_handler(content_types=[types.ContentType.PHOTO])
-async def cats(message: types.Message):
+async def enhance(message: types.Message):
     global rdn
     path = "photos/"+message.photo[-1]['file_unique_id']+".jpg"
     await message.photo[-1].download(path)
     await message.answer("Qabul qildim kutib turing...")
     img = Image.open(path)
-    sr_img = rdn.predict(np.array(img), by_patch_of_size=50)
-    await message.reply_photo(open(image(Image.fromarray(sr_img)), "rb"))
+    sr_img = rdn.predict(np.array(img))
+    await message.reply_document(image(Image.fromarray(sr_img)))
     os.remove(path)
 
 
