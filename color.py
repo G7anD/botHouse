@@ -1,14 +1,10 @@
 import logging
 from aiogram import Bot, Dispatcher, executor, types
-import numpy as np
-from PIL import Image
-from ISR.models import RDN
 import os
+import requests
 
 
-rdn = RDN(arch_params={'C':6, 'D':20, 'G':64, 'G0':64, 'x':2})
-rdn.model.load_weights('./models/noise.hdf5')
-API_TOKEN = '1108700993:AAElQREFLmwdx0MR9hJKlUf2Wk5Rd0uDc30'
+API_TOKEN = '1768766909:AAEmG8Wnl1ri_4mWDeNPE6nsGW_8eyMnYC4'
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -22,27 +18,28 @@ async def send_welcome(message: types.Message):
         url='https://t.me/quanticuz'),
     )
     await message.reply("Assalomu alaykum, sizda " \
-                        "kattalashtiriladigan rasm bormi? 😊",
+                        "oq-qora rasm bormi? Biz uni rangli qilib beramiz. 😊",
                         reply_markup=keyboard_markup)
 
-def get_photo_url(url):
-    r = requests.get(url)
-
-    response = requests.post(
-            'https://telegra.ph/upload',
-            files={'file': ('file', r.content, 'image/jpg')}
-        )
-    return response.json()
 
 @dp.message_handler(content_types=[types.ContentType.PHOTO])
-async def enhance(message: types.Message):
-    global rdn
+async def makelink(message: types.Message):
+    keyboard_markup = types.InlineKeyboardMarkup()
+    keyboard_markup.add(
+        types.InlineKeyboardButton('bot Quantic LLC tomonidan ishlab chiqildi', 
+        url='https://t.me/quanticuz'),
+    )
     path = "photos/"+message.photo[-1]['file_unique_id']+".jpg"
     await message.photo[-1].download(path)
-    await message.answer("Qabul qildim kutib turing...")
-    img = Image.open(path)
-    sr_img = rdn.predict(np.array(img))
-    await message.reply_document(image(Image.fromarray(sr_img)))
+    r = requests.post(
+        "https://api.deepai.org/api/colorizer",
+        files={
+            'image': open(path, 'rb'),
+        },
+        headers={'api-key': '80f8a4de-a59f-410a-b5d2-4d234cc3bf5e'}
+    )
+    await message.reply_photo(r.json()['output_url'],
+                        reply_markup=keyboard_markup)
     os.remove(path)
 
 
@@ -53,7 +50,7 @@ async def echo(message: types.Message):
         types.InlineKeyboardButton('Batafsil ma\'lumot olish uchun', 
         url='https://t.me/quanticuz'),
     )
-    await message.reply("Rasm yuboring sizga 2x kattalashtirib jo'natamiz 😊",
+    await message.reply("Oq-Qora rasm yuboring sizga rangli ko'rinishida qaytaramiz 😊",
                                     reply_markup=keyboard_markup)
 
 
