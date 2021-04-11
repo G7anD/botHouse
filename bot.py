@@ -25,14 +25,13 @@ async def send_welcome(message: types.Message):
                         "kattalashtiriladigan rasm bormi? 😊",
                         reply_markup=keyboard_markup)
 
-def get_photo_url(url):
-    r = requests.get(url)
-
-    response = requests.post(
-            'https://telegra.ph/upload',
-            files={'file': ('file', r.content, 'image/jpg')}
-        )
-    return response.json()
+def image(pil):
+    from io import BytesIO
+    location = BytesIO()
+    location.name = 'image.jpg'
+    pil.save(location, 'JPEG')
+    location.seek(0)
+    return location
 
 @dp.message_handler(content_types=[types.ContentType.PHOTO])
 async def enhance(message: types.Message):
