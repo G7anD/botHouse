@@ -55,10 +55,14 @@ async def enhance(message: types.Message):
         else:
             path = "photos/"+message.photo[-1]['file_unique_id']+".jpg"
             await message.photo[-1].download(path)
-
+        keyboard_markup = types.InlineKeyboardMarkup()
+        keyboard_markup.add(
+            types.InlineKeyboardButton('bot Quantic LLC tomonidan ishlab chiqildi', 
+            url=f'https://t.me/{CHANNEL}'),
+        )
         img = Image.open(path)
         sr_img = rdn.predict(np.array(img))
-        await message.reply_document(image(Image.fromarray(sr_img)))
+        await message.reply_document(image(Image.fromarray(sr_img)), reply_markup=keyboard_markup)
         os.remove(path)
 
 
