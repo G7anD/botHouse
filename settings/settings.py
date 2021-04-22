@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'linkpicsbot',
     'colpicsbot', 
     'photogrybot',
+    'happyRamazonbot',
 ]
 
 
