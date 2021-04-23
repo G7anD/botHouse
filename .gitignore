@@ -2,4 +2,4 @@ env/
 photos/
 results/
 log_file
-__pycache__/
+__pycache__
