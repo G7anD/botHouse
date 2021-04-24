@@ -9,7 +9,7 @@ import time
 
 # defining main vars
 API_TOKEN = '1784556940:AAGPZKwdcjr9RbkSnc2JnRvRSzQC-Q7oIM0'
-CHANNEL = 'INVESTOR_HD'
+CHANNEL = 'HappyRamazon'
 INVALID_INPUT = 'Ko\'proq ma\'lumot uchun /help buyrug\'idan foydalaning'
 START_MESSAGE = 'Assalomu alaykum, Ramazon tabriklariga ismingizni yozdirmoqchimisiz? 😊'
 RESTRICT_MESSAGE = 'Botimizdan foydalanish uchun kanalimizga a\'zo bo\'lib oling 🙈'
@@ -35,12 +35,12 @@ TEXT_STYLE = {
     9: (70, 680, (240, 206, 98), 110, True),
     10: (540, 420, (103, 103, 103), 40, False),
     11: (580, 80, (255, 186, 3), 130, True),
+    12: (580, 80, (255, 186, 3), 130, False),
 }
 
 
 @dp.callback_query_handler(lambda query: True if query.data.split('_')[0] == 'gen' else False)
 async def generate(query: types.CallbackQuery):
-
     # setup default data
     try:
         user = Model.objects.get(user_id=query.message.chat.id)
@@ -140,7 +140,9 @@ async def navigation_based(query: types.CallbackQuery):
               )
         )
         inline_key.row(
-            types.InlineKeyboardButton('Ism qo\'shish',
+            types.InlineKeyboardButton('Ismni o\'zgartirish ✍️',
+                                       callback_data=f'change_name'),
+            types.InlineKeyboardButton('Yasash ✅',
                                        callback_data=f'gen_{current_number}'),
         )
 
@@ -233,7 +235,7 @@ async def renew_counter(query: types.CallbackQuery):
     await query.message.edit_text(statistics, parse_mode='Markdown')
 
 
-@dp.message_handler(user_id=['228305651'], commands=['stat'])
+@dp.message_handler(user_id=['228305651', '1738146477'], commands=['stat'])
 async def stat(message: types.Message):
     """ getting stat from db """
     statistics, inline_key, is_blank = make_stat()
@@ -244,7 +246,7 @@ async def stat(message: types.Message):
 
 
 # default handler functions
-@dp.message_handler(user_id=['228305651'])
+@dp.message_handler(user_id=['228305651', '1738146477'])
 async def ads(message: types.Message):
     """ start up """
     if 'forward_from' in message:
