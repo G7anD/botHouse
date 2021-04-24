@@ -3,6 +3,8 @@ import os
 from utils import Initializer
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+import datetime
+import time
 
 
 # defining main vars
@@ -96,11 +98,11 @@ async def start_choosing(query: types.CallbackQuery):
           )
     )
     inline_key.row(
-            types.InlineKeyboardButton('Ismni o\'zgartirish ✍️',
-                                       callback_data=f'change_name'),                    
-            types.InlineKeyboardButton('Yasash ✅',
-                                       callback_data=f'gen_{current_number}'),
-        )
+        types.InlineKeyboardButton('Ismni o\'zgartirish ✍️',
+                                   callback_data=f'change_name'),
+        types.InlineKeyboardButton('Yasash ✅',
+                                   callback_data=f'gen_{current_number}'),
+    )
 
     await bot.send_photo(query.message.chat.id,
                          open(
@@ -123,11 +125,11 @@ async def navigation_based(query: types.CallbackQuery):
               )
         )
         inline_key.row(
-                types.InlineKeyboardButton('Ismni o\'zgartirish ✍️',
-                                        callback_data=f'change_name'),                    
-                types.InlineKeyboardButton('Yasash ✅',
-                                        callback_data=f'gen_{current_number}'),
-            )
+            types.InlineKeyboardButton('Ismni o\'zgartirish ✍️',
+                                       callback_data=f'change_name'),
+            types.InlineKeyboardButton('Yasash ✅',
+                                       callback_data=f'gen_{current_number}'),
+        )
 
     elif current_number == max_number:
         inline_key.row(
@@ -152,7 +154,7 @@ async def navigation_based(query: types.CallbackQuery):
         )
         inline_key.row(
             types.InlineKeyboardButton('Ismni o\'zgartirish ✍️',
-                                       callback_data=f'change_name'),                    
+                                       callback_data=f'change_name'),
             types.InlineKeyboardButton('Yasash ✅',
                                        callback_data=f'gen_{current_number}'),
         )
@@ -188,6 +190,81 @@ async def send_welcome(message: types.Message):
         await message.reply(RESTRICT_MESSAGE, reply_markup=keyboard_markup)
 
 
+def make_stat():
+    inline_key = types.InlineKeyboardMarkup()
+    all_user = Model.objects.all().count()
+    left = Model.objects.filter(is_send=False).count()
+    send = Model.objects.filter(is_send=True).count()
+
+    today = datetime.date.today()
+
+    todays = Model.objects.filter(
+        created_at__year=today.year,
+        created_at__month=today.month,
+        created_at__day=today.day).count()
+
+    yesterdays_user = Model.objects.filter(
+        created_at__year=today.year,
+        created_at__month=today.month,
+        created_at__day=today.day-1).count()
+
+    statistics = "📊 *Statistika*\n"\
+                 f"🔹 Barcha foydalanuvchilar: *{all_user}*\n"\
+                 f"🔹 Bugun qo'shilganlar: *{todays}*\n"\
+                 f"🔹 Kecha qo'shilganlar: *{yesterdays_user}*\n\n"\
+                 f"📨 *So'nggi jo'natilgan xabar*\n"\
+                 f"🔸 Xabar jo'natilmaganlar: *{left}*\n"\
+                 f"🔸 Xabar jo'natilganlar: *{send}*"
+    inline_key.add(
+        types.InlineKeyboardButton('Hisoblagichni yangilash 🔄',
+                                   callback_data='renew'),
+    )
+    return (statistics, inline_key, send)
+
+
+@dp.callback_query_handler(lambda query: query.data == 'renew')
+async def renew_counter(query: types.CallbackQuery):
+    try:
+        Model.objects.all().update(is_send=False)
+        statistics, __, _ = make_stat()
+    except:
+        pass
+
+    await query.message.edit_text(statistics, parse_mode='Markdown')
+
+
+@dp.message_handler(user_id=['228305651'], commands=['stat'])
+async def stat(message: types.Message):
+    """ getting stat from db """
+    statistics, inline_key, is_blank = make_stat()
+    if is_blank != 0:
+        await message.reply(statistics, reply_markup=inline_key, parse_mode='Markdown')
+    else:
+        await message.reply(statistics, parse_mode='Markdown')
+
+
+# default handler functions
+@dp.message_handler(user_id=['228305651'])
+async def ads(message: types.Message):
+    """ start up """
+    if 'forward_from' in message:
+        users = Model.objects.all()
+        for user in users:
+            if not user.is_send:
+                try:
+                    await message.send_copy(user.user_id)
+                except Exception as e:
+                    e = str(e)
+                    if "Flood" in e:
+                        user.send_error = "flood"
+                    elif "bot was blocked" in e:
+                        user.send_error = "bot was blocked by the user"
+                    else:
+                        user.send_error = str(e)
+                user.is_send = True
+                user.save()
+
+
 @dp.message_handler()
 async def invalid(message: types.Message):
     """ response for invalid input """
@@ -197,13 +274,12 @@ async def invalid(message: types.Message):
         types.InlineKeyboardButton('Kanalga a\'zo bo\'lish',
                                    url=f'https://t.me/{CHANNEL}'),
     )
-    
+
     try:
         user = Model.objects.get(user_id=message.from_user.id)
         state = user.custom_name_change_is_open
     except:
         state = False
-
 
     if not utils.is_member(message.from_user.id):
         await message.reply(RESTRICT_MESSAGE, reply_markup=keyboard_markup)
@@ -220,7 +296,6 @@ async def invalid(message: types.Message):
         )
         await message.reply(INVALID_INPUT,
                             reply_markup=keyboard_markup)
-
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
