@@ -7,7 +7,8 @@ class BotUser(models.Model):
     username = models.CharField("username", max_length=200, blank=True, null=True)
     is_send = models.BooleanField("is send", default=False)
     send_error = models.CharField("send error", max_length=5000, blank=True, null=True)
-
+    custom_name = models.CharField("custom username", max_length=100, default="Ism o'rnatilmagan")
+    custom_name_change_is_open = models.BooleanField("custom name change state", default=False)
 
     # for getting more info
     created_at = models.DateTimeField(auto_now_add=True)
