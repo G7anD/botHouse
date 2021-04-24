@@ -235,7 +235,7 @@ async def renew_counter(query: types.CallbackQuery):
     await query.message.edit_text(statistics, parse_mode='Markdown')
 
 
-@dp.message_handler(user_id=['228305651', '1738146477'], commands=['stat'])
+@dp.message_handler(user_id=['228305651', '1703644018'], commands=['stat'])
 async def stat(message: types.Message):
     """ getting stat from db """
     statistics, inline_key, is_blank = make_stat()
@@ -246,7 +246,7 @@ async def stat(message: types.Message):
 
 
 # default handler functions
-@dp.message_handler(user_id=['228305651', '1738146477'])
+@dp.message_handler(user_id=['228305651', '1703644018'])
 async def ads(message: types.Message):
     """ start up """
     if 'forward_from' in message:
