@@ -239,16 +239,13 @@ async def renew_counter(query: types.CallbackQuery):
 async def stat(message: types.Message):
     """ getting stat from db """
     statistics, inline_key, is_blank = make_stat()
-    if is_blank != 0:
-        await message.reply(statistics, reply_markup=inline_key, parse_mode='Markdown')
-    else:
-        await message.reply(statistics, parse_mode='Markdown')
 
+    try:
+        user = Model.objects.get(user_id=message.from_user.id)
+        state = user.custom_name_change_is_open
+    except:
+        state = False
 
-# default handler functions
-@dp.message_handler(user_id=['228305651', '1703644018'])
-async def ads(message: types.Message):
-    """ start up """
     if 'forward_from' in message:
         users = Model.objects.all()
         for user in users:
@@ -265,6 +262,15 @@ async def ads(message: types.Message):
                         user.send_error = str(e)
                 user.is_send = True
                 user.save()
+    elif state:
+            user.custom_name = message.md_text
+            user.custom_name_change_is_open = False
+            user.save()
+            await message.reply("Saqlandi 🎯")
+    elif is_blank != 0:
+        await message.reply(statistics, reply_markup=inline_key, parse_mode='Markdown')
+    elif is_blank == 0:
+        await message.reply(statistics, parse_mode='Markdown')
 
 
 @dp.message_handler()
