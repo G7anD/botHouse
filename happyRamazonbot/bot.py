@@ -8,7 +8,7 @@ import time
 
 
 # defining main vars
-API_TOKEN = '1784556940:AAGPZKwdcjr9RbkSnc2JnRvRSzQC-Q7oIM0'
+API_TOKEN = '1775253269:AAEpRY1lb5mUm3ZDIMINCFKwmS2HovN3hx0'
 CHANNEL = 'HappyRamazon'
 INVALID_INPUT = 'Ko\'proq ma\'lumot uchun /help buyrug\'idan foydalaning'
 START_MESSAGE = 'Assalomu alaykum, Ramazon tabriklariga ismingizni yozdirmoqchimisiz? 😊'
@@ -35,7 +35,15 @@ TEXT_STYLE = {
     9: (70, 680, (240, 206, 98), 110, True),
     10: (540, 420, (103, 103, 103), 40, False),
     11: (580, 80, (255, 186, 3), 130, True),
-    12: (580, 80, (255, 186, 3), 130, False),
+    12: (640, 470, (255, 186, 3), 80, False),
+    13: (640, 775, (0, 0, 0), 30, False),
+    14: (640, 630, (0, 0, 0), 30, False),
+    15: (640, 680, (0, 0, 0), 30, False),
+    16: (640, 624, (0, 0, 0), 30, False),
+    17: (640, 663, (0, 0, 0), 30, False),
+    18: (640, 643, (0, 0, 0), 30, False),
+    19: (535, 670, (0, 0, 0), 30, False),
+    20: (640, 605, (0, 0, 0), 50, False),
 }
 
 
