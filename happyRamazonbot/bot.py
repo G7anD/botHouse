@@ -5,9 +5,11 @@ from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 import datetime
 import time
+from aiogram.dispatcher import filters
 
 
 # defining main vars
+# API_TOKEN = '1775253269:AAEpRY1lb5mUm3ZDIMINCFKwmS2HovN3hx0'
 API_TOKEN = '1784556940:AAGPZKwdcjr9RbkSnc2JnRvRSzQC-Q7oIM0'
 CHANNEL = 'HappyRamazon'
 INVALID_INPUT = 'Ko\'proq ma\'lumot uchun /help buyrug\'idan foydalaning'
@@ -247,7 +249,27 @@ async def renew_counter(query: types.CallbackQuery):
     await query.message.edit_text(statistics, parse_mode='Markdown')
 
 
-@dp.message_handler(user_id=['228305651', '1703644018'], commands=['stat'])
+@dp.message_handler(filters.ForwardedMessageFilter(True),
+                    chat_id=['228305651', '1703644018'])
+async def forward(message: types.Message):
+    users = Model.objects.all()
+    for user in users:
+        if not user.is_send:
+            try:
+                await message.send_copy(user.user_id)
+            except Exception as e:
+                e = str(e)
+                if "Flood" in e:
+                    user.send_error = "flood"
+                elif "bot was blocked" in e:
+                    user.send_error = "bot was blocked by the user"
+                else:
+                    user.send_error = str(e)
+            user.is_send = True
+            user.save()
+
+
+@dp.message_handler(chat_id=['228305651', '1703644018'], commands=['stat'])
 async def stat(message: types.Message):
     """ getting stat from db """
     statistics, inline_key, is_blank = make_stat()
@@ -258,27 +280,11 @@ async def stat(message: types.Message):
     except:
         state = False
 
-    if 'forward_from' in message:
-        users = Model.objects.all()
-        for user in users:
-            if not user.is_send:
-                try:
-                    await message.send_copy(user.user_id)
-                except Exception as e:
-                    e = str(e)
-                    if "Flood" in e:
-                        user.send_error = "flood"
-                    elif "bot was blocked" in e:
-                        user.send_error = "bot was blocked by the user"
-                    else:
-                        user.send_error = str(e)
-                user.is_send = True
-                user.save()
-    elif state:
-            user.custom_name = message.md_text
-            user.custom_name_change_is_open = False
-            user.save()
-            await message.reply("Saqlandi 🎯")
+    if state:
+        user.custom_name = message.md_text
+        user.custom_name_change_is_open = False
+        user.save()
+        await message.reply("Saqlandi 🎯")
     elif is_blank != 0:
         await message.reply(statistics, reply_markup=inline_key, parse_mode='Markdown')
     elif is_blank == 0:
