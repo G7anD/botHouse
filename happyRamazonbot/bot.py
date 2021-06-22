@@ -11,7 +11,7 @@ from aiogram.dispatcher import filters
 # defining main vars
 # API_TOKEN = '1775253269:AAEpRY1lb5mUm3ZDIMINCFKwmS2HovN3hx0'
 API_TOKEN = '1784556940:AAGPZKwdcjr9RbkSnc2JnRvRSzQC-Q7oIM0'
-CHANNEL = 'HappyRamazon'
+CHANNEL = 'Orzularimizkabi'
 INVALID_INPUT = 'Ko\'proq ma\'lumot uchun /help buyrug\'idan foydalaning'
 START_MESSAGE = 'Assalomu alaykum, Ramazon tabriklariga ismingizni yozdirmoqchimisiz? 😊'
 RESTRICT_MESSAGE = 'Botimizdan foydalanish uchun kanalimizga a\'zo bo\'lib oling 🙈'
